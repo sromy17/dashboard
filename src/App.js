@@ -1,7 +1,19 @@
 import { useState, useEffect } from "react";
 import "./index.css";
 
-const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+// Military color palette
+const MILITARY_COLORS = {
+  bg: "#23291e", // dark olive
+  panel: "#2d3324", // olive drab
+  border: "#6b7a4b", // khaki/olive border
+  accent: "#b5b682", // khaki
+  text: "#e5e5c7", // off-white
+  alert: "#e63946", // red alert
+  online: "#43ff43", // green online
+};
+
+const MILITARY_FONT = '"Share Tech Mono", "Fira Mono", "Consolas", "Menlo", monospace';
+
 const DEFAULT_CITY = "Raleigh";
 const FALLBACK_QUOTES = [
   {
@@ -220,52 +232,36 @@ function App() {
 
   return (
     <div
-      className={
-        "min-h-screen w-screen flex flex-col items-center justify-center p-2 md:p-4 transition-colors duration-500 relative overflow-hidden dark bg-gray-950"
-      }
+      style={{
+        minHeight: "100vh",
+        width: "100vw",
+        background: MILITARY_COLORS.bg,
+        color: MILITARY_COLORS.text,
+        fontFamily: MILITARY_FONT,
+        letterSpacing: 1.5,
+      }}
+      className="flex flex-col items-center justify-center p-2 md:p-4 transition-colors duration-500 relative overflow-hidden"
     >
-      {/* Futuristic Animated Background with more movement */}
-      <div className="absolute inset-0 -z-10 pointer-events-none">
-        <svg className="w-full h-full animate-fade-in" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="bg1" cx="50%" cy="50%" r="80%" fx="50%" fy="50%" gradientTransform="rotate(20)">
-              <stop offset="0%" stopColor="#00eaff" stopOpacity="0.22" />
-              <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
-            </radialGradient>
-            <radialGradient id="bg2" cx="80%" cy="20%" r="60%" fx="80%" fy="20%">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.15" />
-              <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient id="pulse1" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#00eaff" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
-          <rect width="1440" height="900" fill="url(#bg1)"/>
-          <rect width="1440" height="900" fill="url(#bg2)"/>
-          <g>
-            <circle cx="1200" cy="200" r="80" fill="#00eaff" fillOpacity="0.08">
-              <animate attributeName="r" values="80;120;80" dur="6s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="300" cy="700" r="120" fill="#38bdf8" fillOpacity="0.10">
-              <animate attributeName="r" values="120;160;120" dur="8s" repeatCount="indefinite" />
-            </circle>
-            <ellipse cx="800" cy="450" rx="180" ry="60" fill="url(#pulse1)" opacity="0.12">
-              <animate attributeName="rx" values="180;220;180" dur="7s" repeatCount="indefinite" />
-            </ellipse>
-            <ellipse cx="600" cy="200" rx="60" ry="180" fill="url(#pulse1)" opacity="0.10">
-              <animate attributeName="ry" values="180;120;180" dur="9s" repeatCount="indefinite" />
-            </ellipse>
-          </g>
-        </svg>
-      </div>
-      <h1 className="text-4xl md:text-6xl font-bold text-cyan-400 mb-4 md:mb-6 text-center drop-shadow-lg tracking-tight">
-        Personal Dashboard <span className="ml-2 px-2 py-1 text-xs bg-green-500/80 text-black rounded shadow animate-pulse align-top">LIVE</span>
+      {/* Military-style header */}
+      <h1
+        className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-center tracking-widest select-none"
+        style={{
+          color: MILITARY_COLORS.accent,
+          fontFamily: MILITARY_FONT,
+          borderBottom: `2px solid ${MILITARY_COLORS.border}`,
+          paddingBottom: 8,
+          textTransform: "uppercase",
+        }}
+      >
+        MISSION CONTROL DASHBOARD
       </h1>
-      <div className="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-6 lg:gap-8 mb-4 md:mb-8">
+      <div className="mb-2 text-xs md:text-base tracking-widest select-none" style={{color: MILITARY_COLORS.online, fontFamily: MILITARY_FONT}}>
+        SYSTEM STATUS: ONLINE
+      </div>
+      <div className="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-2 md:mb-6">
         {/* To-Do List Widget */}
-        <div className="bg-gray-900/80 rounded-xl p-4 md:p-6 shadow-glass col-span-2 flex flex-col backdrop-blur-md border border-cyan-400/20 min-h-[340px] max-h-[380px]">
-          <h2 className="text-2xl font-semibold text-cyan-300 mb-4 tracking-tight">To-Do List</h2>
+        <div style={{background: MILITARY_COLORS.panel, border: `2px solid ${MILITARY_COLORS.border}`}} className="rounded-lg p-4 md:p-6 col-span-2 flex flex-col min-h-[320px] max-h-[360px]">
+          <h2 className="text-xl font-bold mb-3 tracking-widest" style={{color: MILITARY_COLORS.accent, fontFamily: MILITARY_FONT, textTransform: 'uppercase'}}>To-Do List</h2>
           <form onSubmit={addTodo} className="flex gap-2 mb-4">
             <input
               className="flex-1 rounded-lg px-4 py-2 bg-gray-900/80 dark:bg-gray-800/80 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent placeholder-gray-400"
@@ -313,91 +309,74 @@ function App() {
             ))}
           </ul>
         </div>
-        {/* Main Clock Widget (Prominent) */}
-        <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[120px] md:min-h-[180px] col-span-1">
-          <h3 className="text-lg font-semibold text-cyan-300 mb-2">Current Time</h3>
-          <div className="text-4xl md:text-5xl font-mono text-accent tracking-widest drop-shadow-lg">
+        {/* Current Time Widget */}
+        <div style={{background: MILITARY_COLORS.panel, border: `2px solid ${MILITARY_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px] md:min-h-[160px] col-span-1">
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: MILITARY_COLORS.accent, fontFamily: MILITARY_FONT, textTransform: 'uppercase'}}>Current Time</h3>
+          <div className="text-3xl md:text-4xl font-mono tracking-widest" style={{color: MILITARY_COLORS.text, fontFamily: MILITARY_FONT}}>
             {time.toLocaleTimeString([], { hour12: false })}
           </div>
         </div>
-        {/* System Info & Uptime */}
-        <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[120px] md:min-h-[180px] col-span-1">
-          <h3 className="text-lg font-semibold text-cyan-300 mb-2">System Info</h3>
-          <div className="text-gray-100 text-xs mb-1">Browser: <span className="text-cyan-200">{systemInfo.browser.split(') ')[0]})</span></div>
-          <div className="text-gray-100 text-xs mb-1">OS: <span className="text-cyan-200">{systemInfo.os}</span></div>
-          <div className="text-gray-100 text-xs mb-1">Screen: <span className="text-cyan-200">{systemInfo.screen}</span></div>
-          <div className="text-gray-100 text-xs">Uptime: <span className="text-green-400">{String(Math.floor(uptime/3600)).padStart(2,'0')}:{String(Math.floor((uptime%3600)/60)).padStart(2,'0')}:{String(uptime%60).padStart(2,'0')}</span></div>
+        {/* Date Widget (Military format) */}
+        <div style={{background: MILITARY_COLORS.panel, border: `2px solid ${MILITARY_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px] md:min-h-[160px] col-span-1">
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: MILITARY_COLORS.accent, fontFamily: MILITARY_FONT, textTransform: 'uppercase'}}>Date</h3>
+          <div className="text-2xl md:text-3xl font-mono tracking-widest" style={{color: MILITARY_COLORS.text, fontFamily: MILITARY_FONT}}>
+            {getDateString(time)}
+          </div>
         </div>
-        {/* Side Widgets (now in a horizontal row) */}
-        <div className="col-span-4 grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6 mt-2">
-          {/* Daily Quote */}
-          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[100px]">
-            <h3 className="text-xl font-semibold text-cyan-300 mb-2">Daily Quote</h3>
-            {quoteLoading && <div className="text-gray-400 animate-pulse">Loading...</div>}
-            {quote && !quoteLoading && (
-              <>
-                <div className="text-gray-100 text-center italic mb-2 text-lg">"{quote.content}"</div>
-                <div className="text-gray-400 text-sm text-right w-full">- {quote.author}</div>
-              </>
-            )}
-          </div>
-          {/* Fun Fact Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
-            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Fun Fact</h3>
-            <div className="text-gray-100 text-center">{fact}</div>
-          </div>
-          {/* Emoji Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px] animate-bounce-slow">
-            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Motivational Emoji</h3>
-            <div className="text-4xl md:text-5xl lg:text-6xl select-none" aria-label="Motivational Emoji">{emoji}</div>
-          </div>
-          {/* Day of Week Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
-            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Today is</h3>
-            <div className="text-2xl font-bold text-gray-100">{getDayOfWeek(time)}</div>
-          </div>
-          {/* Weather Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[100px] col-span-2">
-            <h3 className="text-xl font-semibold text-cyan-300 mb-2">Weather</h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setCity(e.target.city.value);
-              }}
-              className="flex gap-2 mb-2 w-full"
-            >
-              <input
-                name="city"
-                className="flex-1 rounded-lg px-2 py-1 bg-gray-900/80 dark:bg-gray-800/80 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent placeholder-gray-400 text-sm"
-                placeholder="Enter city..."
-                defaultValue={city}
-              />
-              <button
-                type="submit"
-                className="bg-accent text-gray-900 font-bold px-3 py-1 rounded-lg hover:bg-accent-hover transition text-sm"
-              >
-                Search
-              </button>
-            </form>
-            {weatherLoading && <div className="text-gray-400 animate-pulse">Loading...</div>}
-            {weatherError && <div className="text-red-400">{weatherError}</div>}
-            {weather && !weatherLoading && !weatherError && weather.main && (
-              <div className="text-center">
-                <div className="text-3xl font-bold text-accent mb-1">
-                  {Math.round(weather.main.temp)}°F
-                </div>
-                <div className="text-gray-200 mb-1">{weather.weather[0].main}</div>
-                <div className="text-gray-400 text-xs">
-                  {weather.name}, {weather.sys.country}
-                </div>
-              </div>
-            )}
-          </div>
+        {/* System Info & Uptime */}
+        <div style={{background: MILITARY_COLORS.panel, border: `2px solid ${MILITARY_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px] md:min-h-[160px] col-span-1">
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: MILITARY_COLORS.accent, fontFamily: MILITARY_FONT, textTransform: 'uppercase'}}>System Info</h3>
+          <div className="text-xs mb-1" style={{color: MILITARY_COLORS.text}}>Browser: <span style={{color: MILITARY_COLORS.accent}}>{systemInfo.browser.split(') ')[0]})</span></div>
+          <div className="text-xs mb-1" style={{color: MILITARY_COLORS.text}}>OS: <span style={{color: MILITARY_COLORS.accent}}>{systemInfo.os}</span></div>
+          <div className="text-xs mb-1" style={{color: MILITARY_COLORS.text}}>Screen: <span style={{color: MILITARY_COLORS.accent}}>{systemInfo.screen}</span></div>
+          <div className="text-xs" style={{color: MILITARY_COLORS.text}}>Uptime: <span style={{color: MILITARY_COLORS.online}}>{String(Math.floor(uptime/3600)).padStart(2,'0')}:{String(Math.floor((uptime%3600)/60)).padStart(2,'0')}:{String(uptime%60).padStart(2,'0')}</span></div>
         </div>
       </div>
-      {/* Footer / Theme Switcher */}
-      <div className="mt-4 md:mt-10 text-cyan-700 text-xs md:text-sm text-center">
-        <span>Your Future is in Your Hands. <span className="animate-pulse">✨</span></span>
+      {/* Second row: Weather */}
+      <div className="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-2 md:mb-6">
+        {/* Weather Widget */}
+        <div style={{background: MILITARY_COLORS.panel, border: `2px solid ${MILITARY_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center col-span-1 md:col-span-2">
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: MILITARY_COLORS.accent, fontFamily: MILITARY_FONT, textTransform: 'uppercase'}}>Weather</h3>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setCity(e.target.city.value);
+            }}
+            className="flex gap-2 mb-2 w-full"
+          >
+            <input
+              name="city"
+              className="flex-1 rounded-lg px-2 py-1 bg-gray-900/80 dark:bg-gray-800/80 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent placeholder-gray-400 text-sm"
+              placeholder="Enter city..."
+              defaultValue={city}
+            />
+            <button
+              type="submit"
+              className="bg-accent text-gray-900 font-bold px-3 py-1 rounded-lg hover:bg-accent-hover transition text-sm"
+            >
+              Search
+            </button>
+          </form>
+          {weatherLoading && <div className="text-gray-400 animate-pulse">Loading...</div>}
+          {weatherError && <div className="text-red-400">{weatherError}</div>}
+          {weather && !weatherLoading && !weatherError && weather.main && (
+            <div className="text-center">
+              <div className="text-3xl font-bold text-accent mb-1">
+                {Math.round(weather.main.temp)}°F
+              </div>
+              <div className="text-gray-200 mb-1">{weather.weather[0].main}</div>
+              <div className="text-gray-400 text-xs">
+                {weather.name}, {weather.sys.country}
+              </div>
+            </div>
+          )}
+        </div>
+        {/* To-Do List (continued) or leave empty for symmetry */}
+        <div className="col-span-2"></div>
+      </div>
+      {/* Footer */}
+      <div className="mt-2 md:mt-6 text-xs md:text-sm text-center tracking-widest select-none" style={{color: MILITARY_COLORS.accent, fontFamily: MILITARY_FONT, borderTop: `2px solid ${MILITARY_COLORS.border}`, paddingTop: 8}}>
+        <span>MISSION TIME: {getDateString(time)} {time.toLocaleTimeString([], { hour12: false })} ZULU</span>
       </div>
     </div>
   );
