@@ -151,8 +151,6 @@ function App() {
   const [uptime, setUptime] = useState(0);
   // System Info State
   const [systemInfo, setSystemInfo] = useState(getSystemInfo());
-  // Compass State
-  const [heading, setHeading] = useState(0);
 
   // Fetch Daily Quote
   useEffect(() => {
@@ -200,23 +198,6 @@ function App() {
       });
   }, [city]);
 
-  // Compass effect (device orientation or simulated)
-  useEffect(() => {
-    function handleOrientation(event) {
-      if (event.alpha !== undefined) {
-        setHeading(Math.round(event.alpha));
-      }
-    }
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener("deviceorientation", handleOrientation, true);
-      return () => window.removeEventListener("deviceorientation", handleOrientation);
-    } else {
-      // Simulate heading
-      const interval = setInterval(() => setHeading((h) => (h + 1) % 360), 100);
-      return () => clearInterval(interval);
-    }
-  }, []);
-
   useEffect(() => {
     // Live clock interval
     const interval = setInterval(() => {
@@ -263,37 +244,32 @@ function App() {
       }}
       className="flex flex-col items-center justify-center p-2 md:p-4 transition-colors duration-500 relative overflow-hidden"
     >
-      {/* Animated SVG background */}
+      {/* Animated SVG background: neon lines, pink/green/cyan */}
       <div className="absolute inset-0 -z-10 pointer-events-none">
-        <svg className="w-full h-full animate-fade-in" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-full h-full" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <radialGradient id="bg1" cx="50%" cy="50%" r="80%" fx="50%" fy="50%">
-              <stop offset="0%" stopColor="#00eaff" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="#0a0a0a" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient id="pulse1" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#00eaff" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.1" />
+            <linearGradient id="neon1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#00eaff" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#ff00cc" stopOpacity="0.7" />
+            </linearGradient>
+            <linearGradient id="neon2" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#39ff14" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#00eaff" stopOpacity="0.7" />
             </linearGradient>
           </defs>
-          <rect width="1440" height="900" fill="url(#bg1)"/>
-          <g>
-            <circle cx="1200" cy="200" r="80" fill="#00eaff" fillOpacity="0.08">
-              <animate attributeName="r" values="80;120;80" dur="6s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="300" cy="700" r="120" fill="#38bdf8" fillOpacity="0.10">
-              <animate attributeName="r" values="120;160;120" dur="8s" repeatCount="indefinite" />
-            </circle>
-            <ellipse cx="800" cy="450" rx="180" ry="60" fill="url(#pulse1)" opacity="0.12">
-              <animate attributeName="rx" values="180;220;180" dur="7s" repeatCount="indefinite" />
-            </ellipse>
-            <ellipse cx="600" cy="200" rx="60" ry="180" fill="url(#pulse1)" opacity="0.10">
-              <animate attributeName="ry" values="180;120;180" dur="9s" repeatCount="indefinite" />
-            </ellipse>
-          </g>
+          {/* Animated neon slivers */}
+          <path d="M0 200 Q 400 100 800 200 T 1440 200" stroke="url(#neon1)" strokeWidth="8" fill="none">
+            <animate attributeName="d" values="M0 200 Q 400 100 800 200 T 1440 200;M0 220 Q 400 180 800 220 T 1440 220;M0 200 Q 400 100 800 200 T 1440 200" dur="8s" repeatCount="indefinite" />
+          </path>
+          <path d="M0 600 Q 600 800 1440 600" stroke="url(#neon2)" strokeWidth="10" fill="none" opacity="0.7">
+            <animate attributeName="d" values="M0 600 Q 600 800 1440 600;M0 620 Q 600 820 1440 620;M0 600 Q 600 800 1440 600" dur="10s" repeatCount="indefinite" />
+          </path>
+          <path d="M0 400 Q 720 300 1440 400" stroke="#ff00cc" strokeWidth="5" fill="none" opacity="0.5">
+            <animate attributeName="d" values="M0 400 Q 720 300 1440 400;M0 420 Q 720 320 1440 420;M0 400 Q 720 300 1440 400" dur="12s" repeatCount="indefinite" />
+          </path>
         </svg>
       </div>
-      {/* Military-style header */}
+      {/* Header */}
       <h1
         className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 text-center tracking-widest select-none"
         style={{
@@ -309,9 +285,10 @@ function App() {
       <div className="mb-2 text-xs md:text-base tracking-widest select-none" style={{color: FUTURE_COLORS.online, fontFamily: FUTURE_FONT}}>
         SYSTEM STATUS: ONLINE
       </div>
-      <div className="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-2 md:mb-6">
-        {/* To-Do List Widget */}
-        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 md:p-6 col-span-2 flex flex-col min-h-[320px] max-h-[360px]">
+      {/* New grid layout: top row To-Do + System Info, Weather + Time/Date; bottom row: Quote + Fun Fact */}
+      <div className="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8 mb-2 md:mb-6">
+        {/* To-Do List (col-span-2) */}
+        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 md:p-6 col-span-2 flex flex-col min-h-[220px] max-h-[320px]">
           <h2 className="text-xl font-bold mb-3 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>To-Do List</h2>
           <form onSubmit={addTodo} className="flex gap-2 mb-4">
             <input
@@ -360,33 +337,16 @@ function App() {
             ))}
           </ul>
         </div>
-        {/* Current Time Widget */}
-        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px] md:min-h-[160px] col-span-1">
-          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Current Time</h3>
-          <div className="text-3xl md:text-4xl font-mono tracking-widest" style={{color: FUTURE_COLORS.text, fontFamily: FUTURE_FONT}}>
-            {time.toLocaleTimeString([], { hour12: false })}
-          </div>
-        </div>
-        {/* Date Widget (Military format) */}
-        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px] md:min-h-[160px] col-span-1">
-          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Date</h3>
-          <div className="text-2xl md:text-3xl font-mono tracking-widest" style={{color: FUTURE_COLORS.text, fontFamily: FUTURE_FONT}}>
-            {getDateString(time)}
-          </div>
-        </div>
-        {/* System Info & Uptime */}
-        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px] md:min-h-[160px] col-span-1">
+        {/* System Info (col-span-2) */}
+        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center col-span-2 min-h-[220px] max-h-[320px]">
           <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>System Info</h3>
           <div className="text-xs mb-1" style={{color: FUTURE_COLORS.text}}>Browser: <span style={{color: FUTURE_COLORS.accent}}>{systemInfo.browser.split(') ')[0]})</span></div>
           <div className="text-xs mb-1" style={{color: FUTURE_COLORS.text}}>OS: <span style={{color: FUTURE_COLORS.accent}}>{systemInfo.os}</span></div>
           <div className="text-xs mb-1" style={{color: FUTURE_COLORS.text}}>Screen: <span style={{color: FUTURE_COLORS.accent}}>{systemInfo.screen}</span></div>
           <div className="text-xs" style={{color: FUTURE_COLORS.text}}>Uptime: <span style={{color: FUTURE_COLORS.online}}>{String(Math.floor(uptime/3600)).padStart(2,'0')}:{String(Math.floor((uptime%3600)/60)).padStart(2,'0')}:{String(uptime%60).padStart(2,'0')}</span></div>
         </div>
-      </div>
-      {/* Second row: Weather */}
-      <div className="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 lg:gap-8 mb-2 md:mb-6">
-        {/* Weather Widget */}
-        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center col-span-1 md:col-span-2">
+        {/* Weather (col-span-2) */}
+        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center col-span-2 min-h-[180px] max-h-[220px]">
           <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Weather</h3>
           <form
             onSubmit={(e) => {
@@ -422,20 +382,44 @@ function App() {
             </div>
           )}
         </div>
-        {/* To-Do List (continued) or leave empty for symmetry */}
-        <div className="col-span-2"></div>
-      </div>
-      {/* Compass Widget */}
-      <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center min-h-[100px] md:min-h-[160px] my-4">
-        <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Compass</h3>
-        <div className="flex flex-col items-center">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle cx="40" cy="40" r="36" stroke={FUTURE_COLORS.border} strokeWidth="3" fill="none" />
-            <g style={{transform: `rotate(${heading}deg)`, transformOrigin: '40px 40px'}}>
-              <polygon points="40,12 44,40 40,30 36,40" fill={FUTURE_COLORS.accent} />
-            </g>
-            <text x="40" y="75" textAnchor="middle" fill={FUTURE_COLORS.text} fontSize="12" fontFamily={FUTURE_FONT}>{heading}°</text>
-          </svg>
+        {/* Time/Date (col-span-2) */}
+        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center col-span-2 min-h-[180px] max-h-[220px]">
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Current Time</h3>
+          <div className="text-3xl md:text-4xl font-mono tracking-widest" style={{color: FUTURE_COLORS.text, fontFamily: FUTURE_FONT}}>
+            {time.toLocaleTimeString([], { hour12: false })}
+          </div>
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Date</h3>
+          <div className="text-2xl md:text-3xl font-mono tracking-widest" style={{color: FUTURE_COLORS.text, fontFamily: FUTURE_FONT}}>
+            {getDateString(time)}
+          </div>
+        </div>
+        {/* Daily Quote (col-span-2) */}
+        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center col-span-2 min-h-[120px] max-h-[180px]">
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Daily Quote</h3>
+          {quoteLoading ? (
+            <div className="text-gray-400 animate-pulse">Loading quote...</div>
+          ) : (
+            <div className="text-center">
+              <div className="text-lg md:text-xl italic mb-1" style={{color: FUTURE_COLORS.text, fontFamily: FUTURE_FONT}}>
+                "{quote.content}"
+              </div>
+              <div className="text-sm md:text-base" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT}}>
+                - {quote.author}
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Fun Fact (col-span-2) */}
+        <div style={{background: FUTURE_COLORS.panel, border: `2px solid ${FUTURE_COLORS.border}`}} className="rounded-lg p-4 flex flex-col items-center justify-center col-span-2 min-h-[120px] max-h-[180px]">
+          <h3 className="text-base font-bold mb-2 tracking-widest" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT, textTransform: 'uppercase'}}>Fun Fact</h3>
+          <div className="text-center">
+            <div className="text-lg md:text-xl italic mb-1" style={{color: FUTURE_COLORS.text, fontFamily: FUTURE_FONT}}>
+              {fact}
+            </div>
+            <div className="text-sm md:text-base" style={{color: FUTURE_COLORS.accent, fontFamily: FUTURE_FONT}}>
+              {emoji}
+            </div>
+          </div>
         </div>
       </div>
       {/* Footer */}
