@@ -3,17 +3,102 @@ import "./index.css";
 
 const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 const DEFAULT_CITY = "Raleigh";
+const FALLBACK_QUOTES = [
+  {
+    content:
+      "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+    author: "Winston Churchill",
+  },
+  {
+    content: "The only way to do great work is to love what you do.",
+    author: "Steve Jobs",
+  },
+  {
+    content: "You miss 100% of the shots you don’t take.",
+    author: "Wayne Gretzky",
+  },
+  {
+    content: "Whether you think you can or you think you can’t, you’re right.",
+    author: "Henry Ford",
+  },
+  {
+    content:
+      "The best time to plant a tree was 20 years ago. The second best time is now.",
+    author: "Chinese Proverb",
+  },
+  {
+    content: "Do what you can, with what you have, where you are.",
+    author: "Theodore Roosevelt",
+  },
+  {
+    content: "Believe you can and you’re halfway there.",
+    author: "Theodore Roosevelt",
+  },
+  {
+    content: "Act as if what you do makes a difference. It does.",
+    author: "William James",
+  },
+  {
+    content: "Happiness is not something ready made. It comes from your own actions.",
+    author: "Dalai Lama",
+  },
+  {
+    content: "Opportunities don't happen. You create them.",
+    author: "Chris Grosser",
+  },
+  {
+    content: "Don’t watch the clock; do what it does. Keep going.",
+    author: "Sam Levenson",
+  },
+  {
+    content: "Everything you’ve ever wanted is on the other side of fear.",
+    author: "George Addair",
+  },
+  {
+    content: "Dream big and dare to fail.",
+    author: "Norman Vaughan",
+  },
+  {
+    content: "It always seems impossible until it’s done.",
+    author: "Nelson Mandela",
+  },
+  {
+    content: "Start where you are. Use what you have. Do what you can.",
+    author: "Arthur Ashe",
+  },
+];
+const FUN_FACTS = [
+  "Honey never spoils.",
+  "Bananas are berries, but strawberries aren't.",
+  "A group of flamingos is called a 'flamboyance'.",
+  "Octopuses have three hearts.",
+  "The Eiffel Tower can be 15 cm taller during hot days.",
+  "Wombat poop is cube-shaped.",
+  "There are more stars in the universe than grains of sand on Earth.",
+  "Some cats are allergic to humans.",
+  "A jiffy is an actual unit of time.",
+  "The unicorn is the national animal of Scotland."
+];
+const MOTIVATIONAL_EMOJIS = [
+  "🚀", "🌟", "🔥", "💡", "🎯", "💪", "✨", "🦾", "🧠", "🏆", "🌈", "🛸", "🤖", "🦄"
+];
+
+function getDayOfWeek(date) {
+  return date.toLocaleDateString(undefined, { weekday: 'long' });
+}
+
+function getRandomEmoji() {
+  return MOTIVATIONAL_EMOJIS[Math.floor(Math.random() * MOTIVATIONAL_EMOJIS.length)];
+}
 
 function App() {
   // To-Do List State
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
-  const [dark, setDark] = useState(true);
 
   // Daily Quote State
   const [quote, setQuote] = useState(null);
   const [quoteLoading, setQuoteLoading] = useState(true);
-  const [quoteError, setQuoteError] = useState(null);
 
   // Weather State
   const [weather, setWeather] = useState(null);
@@ -21,10 +106,16 @@ function App() {
   const [weatherError, setWeatherError] = useState(null);
   const [city, setCity] = useState(DEFAULT_CITY);
 
+  // Clock State
+  const [time, setTime] = useState(new Date());
+  // Fun Fact State
+  const [fact, setFact] = useState("");
+  // Emoji State
+  const [emoji, setEmoji] = useState(getRandomEmoji());
+
   // Fetch Daily Quote
   useEffect(() => {
     setQuoteLoading(true);
-    setQuoteError(null);
     fetch("https://api.quotable.io/random?maxLength=100")
       .then((res) => {
         if (!res.ok) throw new Error();
@@ -35,7 +126,12 @@ function App() {
         setQuoteLoading(false);
       })
       .catch(() => {
-        setQuoteError("Could not fetch quote. Try refreshing.");
+        // Use a random fallback quote if API fails
+        const fallback =
+          FALLBACK_QUOTES[
+            Math.floor(Math.random() * FALLBACK_QUOTES.length)
+          ];
+        setQuote(fallback);
         setQuoteLoading(false);
       });
   }, []);
@@ -63,6 +159,15 @@ function App() {
       });
   }, [city]);
 
+  useEffect(() => {
+    // Live clock interval
+    const interval = setInterval(() => setTime(new Date()), 1000);
+    // Pick a random fun fact on mount
+    setFact(FUN_FACTS[Math.floor(Math.random() * FUN_FACTS.length)]);
+    setEmoji(getRandomEmoji());
+    return () => clearInterval(interval);
+  }, []);
+
   // To-Do List Handlers
   const addTodo = (e) => {
     e.preventDefault();
@@ -86,25 +191,52 @@ function App() {
 
   return (
     <div
-      className={`${
-        dark ? "dark" : ""
-      } min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-500 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800`}
+      className={
+        "min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-500 relative overflow-hidden dark bg-gray-950"
+      }
     >
-      <div className="absolute top-4 right-4">
-        <button
-          className="rounded-full px-4 py-2 bg-accent text-gray-900 font-bold shadow hover:bg-accent-hover transition"
-          onClick={() => setDark((d) => !d)}
-        >
-          {dark ? "☀️ Light" : "🌙 Dark"}
-        </button>
+      {/* Futuristic Animated Background with more movement */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <svg className="w-full h-full animate-fade-in" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="bg1" cx="50%" cy="50%" r="80%" fx="50%" fy="50%" gradientTransform="rotate(20)">
+              <stop offset="0%" stopColor="#00eaff" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
+            </radialGradient>
+            <radialGradient id="bg2" cx="80%" cy="20%" r="60%" fx="80%" fy="20%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="#0f172a" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient id="pulse1" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#00eaff" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          <rect width="1440" height="900" fill="url(#bg1)"/>
+          <rect width="1440" height="900" fill="url(#bg2)"/>
+          <g>
+            <circle cx="1200" cy="200" r="80" fill="#00eaff" fillOpacity="0.08">
+              <animate attributeName="r" values="80;120;80" dur="6s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="300" cy="700" r="120" fill="#38bdf8" fillOpacity="0.10">
+              <animate attributeName="r" values="120;160;120" dur="8s" repeatCount="indefinite" />
+            </circle>
+            <ellipse cx="800" cy="450" rx="180" ry="60" fill="url(#pulse1)" opacity="0.12">
+              <animate attributeName="rx" values="180;220;180" dur="7s" repeatCount="indefinite" />
+            </ellipse>
+            <ellipse cx="600" cy="200" rx="60" ry="180" fill="url(#pulse1)" opacity="0.10">
+              <animate attributeName="ry" values="180;120;180" dur="9s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        </svg>
       </div>
-      <h1 className="text-4xl md:text-6xl font-bold text-accent mb-6 text-center drop-shadow-lg">
+      <h1 className="text-4xl md:text-6xl font-bold text-cyan-400 mb-6 text-center drop-shadow-lg tracking-tight">
         Personal Dashboard
       </h1>
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12 mb-8">
         {/* To-Do List Widget */}
-        <div className="bg-white/10 dark:bg-white/5 rounded-xl p-6 shadow-glass col-span-2 flex flex-col backdrop-blur-xs border border-white/20">
-          <h2 className="text-2xl font-semibold text-accent mb-4">To-Do List</h2>
+        <div className="bg-gray-900/80 rounded-xl p-6 shadow-glass col-span-2 flex flex-col backdrop-blur-md border border-cyan-400/20">
+          <h2 className="text-2xl font-semibold text-cyan-300 mb-4 tracking-tight">To-Do List</h2>
           <form onSubmit={addTodo} className="flex gap-2 mb-4">
             <input
               className="flex-1 rounded-lg px-4 py-2 bg-gray-900/80 dark:bg-gray-800/80 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-accent placeholder-gray-400"
@@ -153,22 +285,41 @@ function App() {
           </ul>
         </div>
         {/* Side Widgets */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8 md:gap-6">
           {/* Daily Quote */}
-          <div className="bg-white/10 dark:bg-white/5 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-xs border border-white/20 min-h-[120px]">
-            <h3 className="text-lg font-semibold text-accent mb-2">Daily Quote</h3>
+          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[120px]">
+            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Daily Quote</h3>
             {quoteLoading && <div className="text-gray-400 animate-pulse">Loading...</div>}
-            {quoteError && <div className="text-red-400">{quoteError}</div>}
-            {quote && !quoteLoading && !quoteError && (
+            {quote && !quoteLoading && (
               <>
                 <div className="text-gray-100 text-center italic mb-2">"{quote.content}"</div>
                 <div className="text-gray-400 text-sm text-right w-full">- {quote.author}</div>
               </>
             )}
           </div>
+          {/* Clock Widget */}
+          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
+            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Current Time</h3>
+            <div className="text-2xl font-mono text-gray-100">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
+          </div>
+          {/* Fun Fact Widget */}
+          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
+            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Fun Fact</h3>
+            <div className="text-gray-100 text-center">{fact}</div>
+          </div>
+          {/* Emoji Widget */}
+          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px] animate-bounce-slow">
+            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Motivational Emoji</h3>
+            <div className="text-4xl md:text-5xl lg:text-6xl select-none" aria-label="Motivational Emoji">{emoji}</div>
+          </div>
+          {/* Day of Week Widget */}
+          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
+            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Today is</h3>
+            <div className="text-2xl font-bold text-gray-100">{getDayOfWeek(time)}</div>
+          </div>
           {/* Weather Widget */}
-          <div className="bg-white/10 dark:bg-white/5 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-xs border border-white/20 min-h-[120px]">
-            <h3 className="text-lg font-semibold text-accent mb-2">Weather</h3>
+          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[120px]">
+            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Weather</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -205,9 +356,9 @@ function App() {
           </div>
         </div>
       </div>
-      {/* Footer / Dark mode toggle placeholder */}
-      <div className="mt-10 text-gray-500 text-sm">
-        Dark mode & more widgets coming soon!
+      {/* Footer / Theme Switcher */}
+      <div className="mt-10 text-cyan-700 text-sm text-center">
+        <span>Futuristic, always dark mode. Tech-savvy vibes. ✨</span>
       </div>
     </div>
   );
