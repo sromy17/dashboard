@@ -397,7 +397,7 @@ function App() {
       </div>
       {/* Footer / Theme Switcher */}
       <div className="mt-4 md:mt-10 text-cyan-700 text-xs md:text-sm text-center">
-        <span>Futuristic, always dark mode. Tech-savvy vibes. <span className="animate-pulse">✨</span></span>
+        <span>Your Future is in Your Hands. <span className="animate-pulse">✨</span></span>
       </div>
     </div>
   );
