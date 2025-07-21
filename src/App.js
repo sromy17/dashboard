@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import "./index.css";
 
+const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+
 // Military color palette
 const MILITARY_COLORS = {
   bg: "#23291e", // dark olive
