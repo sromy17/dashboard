@@ -80,7 +80,7 @@ const FUN_FACTS = [
   "The unicorn is the national animal of Scotland."
 ];
 const MOTIVATIONAL_EMOJIS = [
-  "🚀", "🌟", "🔥", "💡", "🎯", "💪", "✨", "🦾", "🧠", "🏆", "🌈", "🛸", "🤖", "🦄"
+  "🚀", "🌟", "🔥", "💡", "🎯", "💪", "✨", "🦾", "🧠", "🏆", "🛸", "🤖",
 ];
 
 function getDayOfWeek(date) {
