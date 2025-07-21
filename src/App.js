@@ -91,6 +91,27 @@ function getRandomEmoji() {
   return MOTIVATIONAL_EMOJIS[Math.floor(Math.random() * MOTIVATIONAL_EMOJIS.length)];
 }
 
+function getDateString(date) {
+  return date.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function getUptime(startTime) {
+  const now = new Date();
+  const diff = Math.floor((now - startTime) / 1000);
+  const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+  const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+  const s = String(diff % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
+function getSystemInfo() {
+  return {
+    browser: navigator.userAgent,
+    os: navigator.platform,
+    screen: `${window.screen.width}x${window.screen.height}`,
+  };
+}
+
 function App() {
   // To-Do List State
   const [todos, setTodos] = useState([]);
@@ -112,6 +133,10 @@ function App() {
   const [fact, setFact] = useState("");
   // Emoji State
   const [emoji, setEmoji] = useState(getRandomEmoji());
+  const [startTime] = useState(new Date());
+  const [uptime, setUptime] = useState(0);
+  // System Info State
+  const [systemInfo, setSystemInfo] = useState(getSystemInfo());
 
   // Fetch Daily Quote
   useEffect(() => {
@@ -161,10 +186,14 @@ function App() {
 
   useEffect(() => {
     // Live clock interval
-    const interval = setInterval(() => setTime(new Date()), 1000);
+    const interval = setInterval(() => {
+      setTime(new Date());
+      setUptime((u) => u + 1);
+    }, 1000);
     // Pick a random fun fact on mount
     setFact(FUN_FACTS[Math.floor(Math.random() * FUN_FACTS.length)]);
     setEmoji(getRandomEmoji());
+    setSystemInfo(getSystemInfo());
     return () => clearInterval(interval);
   }, []);
 
@@ -192,7 +221,7 @@ function App() {
   return (
     <div
       className={
-        "min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-500 relative overflow-hidden dark bg-gray-950"
+        "min-h-screen w-screen flex flex-col items-center justify-center p-2 md:p-4 transition-colors duration-500 relative overflow-hidden dark bg-gray-950"
       }
     >
       {/* Futuristic Animated Background with more movement */}
@@ -230,12 +259,12 @@ function App() {
           </g>
         </svg>
       </div>
-      <h1 className="text-4xl md:text-6xl font-bold text-cyan-400 mb-6 text-center drop-shadow-lg tracking-tight">
-        Personal Dashboard
+      <h1 className="text-4xl md:text-6xl font-bold text-cyan-400 mb-4 md:mb-6 text-center drop-shadow-lg tracking-tight">
+        Personal Dashboard <span className="ml-2 px-2 py-1 text-xs bg-green-500/80 text-black rounded shadow animate-pulse align-top">LIVE</span>
       </h1>
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 lg:gap-12 mb-8">
+      <div className="w-full max-w-[1600px] grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-6 lg:gap-8 mb-4 md:mb-8">
         {/* To-Do List Widget */}
-        <div className="bg-gray-900/80 rounded-xl p-6 shadow-glass col-span-2 flex flex-col backdrop-blur-md border border-cyan-400/20">
+        <div className="bg-gray-900/80 rounded-xl p-4 md:p-6 shadow-glass col-span-2 flex flex-col backdrop-blur-md border border-cyan-400/20 min-h-[340px] max-h-[380px]">
           <h2 className="text-2xl font-semibold text-cyan-300 mb-4 tracking-tight">To-Do List</h2>
           <form onSubmit={addTodo} className="flex gap-2 mb-4">
             <input
@@ -284,42 +313,52 @@ function App() {
             ))}
           </ul>
         </div>
-        {/* Side Widgets */}
-        <div className="flex flex-col gap-8 md:gap-6">
+        {/* Main Clock Widget (Prominent) */}
+        <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[120px] md:min-h-[180px] col-span-1">
+          <h3 className="text-lg font-semibold text-cyan-300 mb-2">Current Time</h3>
+          <div className="text-4xl md:text-5xl font-mono text-accent tracking-widest drop-shadow-lg">
+            {time.toLocaleTimeString([], { hour12: false })}
+          </div>
+        </div>
+        {/* System Info & Uptime */}
+        <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[120px] md:min-h-[180px] col-span-1">
+          <h3 className="text-lg font-semibold text-cyan-300 mb-2">System Info</h3>
+          <div className="text-gray-100 text-xs mb-1">Browser: <span className="text-cyan-200">{systemInfo.browser.split(') ')[0]})</span></div>
+          <div className="text-gray-100 text-xs mb-1">OS: <span className="text-cyan-200">{systemInfo.os}</span></div>
+          <div className="text-gray-100 text-xs mb-1">Screen: <span className="text-cyan-200">{systemInfo.screen}</span></div>
+          <div className="text-gray-100 text-xs">Uptime: <span className="text-green-400">{String(Math.floor(uptime/3600)).padStart(2,'0')}:{String(Math.floor((uptime%3600)/60)).padStart(2,'0')}:{String(uptime%60).padStart(2,'0')}</span></div>
+        </div>
+        {/* Side Widgets (now in a horizontal row) */}
+        <div className="col-span-4 grid grid-cols-2 md:grid-cols-6 gap-4 md:gap-6 mt-2">
           {/* Daily Quote */}
-          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[120px]">
-            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Daily Quote</h3>
+          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[100px]">
+            <h3 className="text-xl font-semibold text-cyan-300 mb-2">Daily Quote</h3>
             {quoteLoading && <div className="text-gray-400 animate-pulse">Loading...</div>}
             {quote && !quoteLoading && (
               <>
-                <div className="text-gray-100 text-center italic mb-2">"{quote.content}"</div>
+                <div className="text-gray-100 text-center italic mb-2 text-lg">"{quote.content}"</div>
                 <div className="text-gray-400 text-sm text-right w-full">- {quote.author}</div>
               </>
             )}
           </div>
-          {/* Clock Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
-            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Current Time</h3>
-            <div className="text-2xl font-mono text-gray-100">{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
-          </div>
           {/* Fun Fact Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
+          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
             <h3 className="text-lg font-semibold text-cyan-300 mb-2">Fun Fact</h3>
             <div className="text-gray-100 text-center">{fact}</div>
           </div>
           {/* Emoji Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px] animate-bounce-slow">
+          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px] animate-bounce-slow">
             <h3 className="text-lg font-semibold text-cyan-300 mb-2">Motivational Emoji</h3>
             <div className="text-4xl md:text-5xl lg:text-6xl select-none" aria-label="Motivational Emoji">{emoji}</div>
           </div>
           {/* Day of Week Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
+          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center justify-center backdrop-blur-md border border-cyan-400/20 min-h-[80px]">
             <h3 className="text-lg font-semibold text-cyan-300 mb-2">Today is</h3>
             <div className="text-2xl font-bold text-gray-100">{getDayOfWeek(time)}</div>
           </div>
           {/* Weather Widget */}
-          <div className="bg-gray-900/80 rounded-xl p-4 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[120px]">
-            <h3 className="text-lg font-semibold text-cyan-300 mb-2">Weather</h3>
+          <div className="bg-gray-900/80 rounded-xl p-3 shadow-glass flex flex-col items-center backdrop-blur-md border border-cyan-400/20 min-h-[100px] col-span-2">
+            <h3 className="text-xl font-semibold text-cyan-300 mb-2">Weather</h3>
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -344,7 +383,7 @@ function App() {
             {weatherError && <div className="text-red-400">{weatherError}</div>}
             {weather && !weatherLoading && !weatherError && weather.main && (
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-1">
+                <div className="text-3xl font-bold text-accent mb-1">
                   {Math.round(weather.main.temp)}°F
                 </div>
                 <div className="text-gray-200 mb-1">{weather.weather[0].main}</div>
@@ -357,8 +396,8 @@ function App() {
         </div>
       </div>
       {/* Footer / Theme Switcher */}
-      <div className="mt-10 text-cyan-700 text-sm text-center">
-        <span>Futuristic, always dark mode. Tech-savvy vibes. ✨</span>
+      <div className="mt-4 md:mt-10 text-cyan-700 text-xs md:text-sm text-center">
+        <span>Futuristic, always dark mode. Tech-savvy vibes. <span className="animate-pulse">✨</span></span>
       </div>
     </div>
   );
